@@ -22,7 +22,7 @@ class Schedule : Noncopyable
 public:
     static const int kStackSize = 1024 * 1024;
 
-    typedef Coroutine::Callback Callback;
+    typedef boost::function<void ()> Callback;
 
     Schedule(int size = 16);
     ~Schedule();
