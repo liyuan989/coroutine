@@ -2,6 +2,8 @@
 #include "Schedule.h"
 
 #include <assert.h>
+#include <string.h>
+#include <stdlib.h>
 
 namespace coroutine
 {
