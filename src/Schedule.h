@@ -8,8 +8,6 @@
 
 #include <ucontext.h>
 
-#include <boost/shared_ptr.hpp>
-
 #include <map>
 #include <vector>
 #include <stdint.h>
