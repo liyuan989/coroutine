@@ -1,3 +1,5 @@
+// This is an internal header file, you should not include this.
+
 #ifndef __COROUTINE_COROUTINE_H__
 #define __COROUTINE_COROUTINE_H__
 

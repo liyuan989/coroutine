@@ -7,9 +7,6 @@
 namespace coroutine
 {
 
-namespace detail
-{
-
 void func(uint32_t low32, uint32_t high32)
 {
     uintptr_t ptr = static_cast<uintptr_t>(low32) | (static_cast<uintptr_t>(high32) << 32);
@@ -24,8 +21,6 @@ void func(uint32_t low32, uint32_t high32)
     schedule->deleteCoroutineById(id);
     schedule->setRunningCoroutineId(id);
 }
-
-}  // namespace detail
 
 const int Schedule::kStackSize;
 
@@ -86,7 +81,7 @@ void Schedule::runCoroutineById(int id)
                 coroutine->setState(Coroutine::kRunning);
                 uintptr_t ptr = reinterpret_cast<uintptr_t>(this);
                 makecontext(coroutine->getContextMutable(),
-                            reinterpret_cast<void (*)()>(detail::func),
+                            reinterpret_cast<void (*)()>(func),
                             2,
                             static_cast<uint32_t>(ptr),
                             static_cast<uint32_t>(ptr >> 32));

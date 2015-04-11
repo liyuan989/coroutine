@@ -17,7 +17,6 @@ set(CMAKE_CXX_FLAGS
 -Wreorder
 -march=native
 -D_FILE_OFFSET_BITS=64
--DCHECK_PTHREAD_RETURN_VALUE
 -rdynamic
 )
 

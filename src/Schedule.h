@@ -1,3 +1,5 @@
+// This is a public header file.
+
 #ifndef __COROUTINE_SCHEDULE_H__
 #define __COROUTINE_SCHEDULE_H__
 
@@ -24,25 +26,28 @@ public:
     Schedule(int size = 16);
     ~Schedule();
 
+    // return new coroutine's id.
     int newCoroutine(const Callback& cb);
     void runCoroutineById(int id);
     void suspendCurrentCoroutine();
     Coroutine::State getCoroutineStateById(int id) const;
-
-    CoroutinePtr getCoroutineById(int id) const;
-    void deleteCoroutineById(int id);
 
     int getRunningCoroutineId() const
     {
         return running_id_;
     }
 
+private:
+    friend void func(uint32_t low32, uint32_t high32);
+
+    CoroutinePtr getCoroutineById(int id) const;
+    void deleteCoroutineById(int id);
+
     void setRunningCoroutineId(int id)
     {
         running_id_ = id;
     }
 
-private:
     typedef std::map<int, CoroutinePtr> CoroutineMap;
 
     const int         kCapacity_;
