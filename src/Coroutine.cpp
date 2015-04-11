@@ -18,7 +18,6 @@ Coroutine::Coroutine(const Callback& callback, int id_arg)
 {
 }
 
-
 Coroutine::~Coroutine()
 {
     assert(state_ == kDead);
