@@ -8,8 +8,8 @@
 namespace coroutine
 {
 
-Coroutine::Coroutine(const Callback& callback, int id_arg)
-    : callback_(callback),
+Coroutine::Coroutine(const CoroutineFunc& func, int id_arg)
+    : func_(func),
       id_(id_arg),
       state_(kReady),
       stack_(NULL),
@@ -25,10 +25,10 @@ Coroutine::~Coroutine()
 
 void Coroutine::start()
 {
-    if (callback_)
+    if (func_)
     {
         setState(kRunning);
-        callback_();
+        func_();
     }
 }
 

@@ -27,9 +27,9 @@ public:
         kSuspend,
     };
 
-    typedef boost::function<void ()> Callback;
+    typedef boost::function<void ()> CoroutineFunc;
 
-    Coroutine(const Callback& callback, int id);
+    Coroutine(const CoroutineFunc& func, int id);
     ~Coroutine();
 
     void start();
@@ -76,13 +76,13 @@ public:
     }
 
 private:
-    Callback     callback_;
-    int          id_;
-    State        state_;
-    ucontext_t   context_;
-    char*        stack_;
-    ptrdiff_t    capacity_;
-    ptrdiff_t    size_;
+    CoroutineFunc  func_;
+    int            id_;
+    State          state_;
+    ucontext_t     context_;
+    char*          stack_;
+    ptrdiff_t      capacity_;
+    ptrdiff_t      size_;
 };
 
 typedef boost::shared_ptr<Coroutine> CoroutinePtr;

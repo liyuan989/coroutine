@@ -6,7 +6,7 @@
 namespace coroutine
 {
 
-void func(uint32_t low32, uint32_t high32)
+void coroutineFunc(uint32_t low32, uint32_t high32)
 {
     uintptr_t ptr = static_cast<uintptr_t>(low32) | (static_cast<uintptr_t>(high32) << 32);
     Schedule* schedule = reinterpret_cast<Schedule*>(ptr);
@@ -16,9 +16,9 @@ void func(uint32_t low32, uint32_t high32)
     {
         coroutine->start();
     }
-    coroutine->setState(coroutine::Coroutine::kDead);
+    coroutine->setState(Coroutine::kDead);
     schedule->deleteCoroutineById(id);
-    schedule->setRunningCoroutineId(id);
+    schedule->setRunningCoroutineId(-1);
 }
 
 const int Schedule::kStackSize;
@@ -35,7 +35,7 @@ Schedule::~Schedule()
     assert(running_id_ == -1);
 }
 
-int Schedule::newCoroutine(const Callback& cb)
+int Schedule::newCoroutine(const CoroutineFunc& func)
 {
     if (coroutines_.size() < static_cast<size_t>(kCapacity_))
     {
@@ -44,19 +44,19 @@ int Schedule::newCoroutine(const Callback& cb)
             int id = (static_cast<int>(coroutines_.size()) + i) % kCapacity_;
             if (flags_[id] == 0)
             {
-                CoroutinePtr new_coroutine(new Coroutine(cb, id));
+                CoroutinePtr new_coroutine(new Coroutine(func, id));
                 flags_[id] = 1;
                 coroutines_[id] = new_coroutine;
                 return id;
             }
         }
+        assert(0);
+        return -1;
     }
     else
     {
         return -1;
     }
-    assert(0);
-    return -1;
 }
 
 void Schedule::runCoroutineById(int id)
@@ -80,7 +80,7 @@ void Schedule::runCoroutineById(int id)
                 coroutine->setState(Coroutine::kRunning);
                 uintptr_t ptr = reinterpret_cast<uintptr_t>(this);
                 makecontext(coroutine->getContextMutable(),
-                            reinterpret_cast<void (*)()>(func),
+                            reinterpret_cast<void (*)()>(coroutineFunc),
                             2,
                             static_cast<uint32_t>(ptr),
                             static_cast<uint32_t>(ptr >> 32));

@@ -20,24 +20,26 @@ class Schedule : Noncopyable
 public:
     static const int kStackSize = 1024 * 1024;
 
-    typedef boost::function<void ()> Callback;
+    typedef boost::function<void ()> CoroutineFunc;
 
     Schedule(int size = 16);
     ~Schedule();
 
-    // return new coroutine's id.
-    int newCoroutine(const Callback& cb);
+    // Return new coroutine's id.
+    // If the schedule is full, return -1.
+    int newCoroutine(const CoroutineFunc& func);
     void runCoroutineById(int id);
     void suspendCurrentCoroutine();
     Coroutine::State getCoroutineStateById(int id) const;
 
+    // If there is no coroutine running, return -1.
     int getRunningCoroutineId() const
     {
         return running_id_;
     }
 
 private:
-    friend void func(uint32_t low32, uint32_t high32);
+    friend void coroutineFunc(uint32_t low32, uint32_t high32);
 
     CoroutinePtr getCoroutineById(int id) const;
     void deleteCoroutineById(int id);
