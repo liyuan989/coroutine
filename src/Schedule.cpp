@@ -107,7 +107,7 @@ void Schedule::runCoroutineById(int id)
 
 void Schedule::suspendCurrentCoroutine()
 {
-    assert(running_id_ >= 0);
+    assert(0 <= running_id_ && running_id_ < kCapacity_);
     CoroutineMap::const_iterator it = coroutines_.find(running_id_);
     if (it != coroutines_.end())
     {
