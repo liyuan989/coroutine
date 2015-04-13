@@ -27,7 +27,7 @@ public:
 
     // Return new coroutine's id.
     // If the schedule is full, return -1.
-    int newCoroutine(const CoroutineFunc& func);
+    int createCoroutine(const CoroutineFunc& func);
     void runCoroutineById(int id);
     void suspendCurrentCoroutine();
     Coroutine::State getCoroutineStateById(int id) const;

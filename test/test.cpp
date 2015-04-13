@@ -18,8 +18,8 @@ void func(Schedule* schedule, int base)
 int main(int argc, char* argv[])
 {
     Schedule schedule;
-    int coroutine1 = schedule.newCoroutine(boost::bind(func, &schedule, 1));
-    int coroutine2 = schedule.newCoroutine(boost::bind(func, &schedule, 1000));
+    int coroutine1 = schedule.createCoroutine(boost::bind(func, &schedule, 1));
+    int coroutine2 = schedule.createCoroutine(boost::bind(func, &schedule, 1000));
     for (int i = 0; i < 5; ++i)
     {
         schedule.runCoroutineById(coroutine1);

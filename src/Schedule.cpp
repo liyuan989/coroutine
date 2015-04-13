@@ -35,7 +35,7 @@ Schedule::~Schedule()
     assert(running_id_ == -1);
 }
 
-int Schedule::newCoroutine(const CoroutineFunc& func)
+int Schedule::createCoroutine(const CoroutineFunc& func)
 {
     if (coroutines_.size() < static_cast<size_t>(kCapacity_))
     {
