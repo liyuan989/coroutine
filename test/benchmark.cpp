@@ -2,8 +2,8 @@
 
 #include <sys/time.h>
 
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
 
 using namespace coroutine;
 
