@@ -14,7 +14,7 @@ void coroutineFunc(uint32_t low32, uint32_t high32)
     const CoroutinePtr& coroutine = schedule->getCoroutineById(id);
     if (coroutine)
     {
-        coroutine->start();
+        coroutine->start(schedule);
     }
     coroutine->setState(Coroutine::kDead);
     schedule->deleteCoroutineById(id);
@@ -69,6 +69,7 @@ void Schedule::runCoroutineById(int id)
         const CoroutinePtr& coroutine = it->second;
         if (coroutine)
         {
+            assert(id == coroutine->id());
             Coroutine::State state = coroutine->state();
             if (state == Coroutine::kReady)
             {
@@ -114,6 +115,7 @@ void Schedule::suspendCurrentCoroutine()
         const CoroutinePtr& coroutine = it->second;
         if (coroutine)
         {
+            assert(running_id_ == coroutine->id());
             Coroutine* p = coroutine.get();
             assert(reinterpret_cast<char*>(&p) > stack_);
             (void)p;
@@ -138,7 +140,16 @@ Coroutine::State Schedule::getCoroutineStateById(int id) const
     CoroutineMap::const_iterator it = coroutines_.find(id);
     if (it != coroutines_.end())
     {
-        return it->second->state();
+        const CoroutinePtr& coroutine = it->second;
+        if (coroutine)
+        {
+            assert(id == coroutine->id());
+            return coroutine->state();
+        }
+        else
+        {
+            return Coroutine::kInvalid;
+        }
     }
     else
     {

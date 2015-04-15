@@ -15,6 +15,8 @@
 namespace coroutine
 {
 
+class Schedule;
+
 class Coroutine : Noncopyable
 {
 public:
@@ -27,12 +29,12 @@ public:
         kSuspend,
     };
 
-    typedef boost::function<void ()> CoroutineFunc;
+    typedef boost::function<void (Schedule*)> CoroutineFunc;
 
     Coroutine(const CoroutineFunc& func, int id);
     ~Coroutine();
 
-    void start();
+    void start(Schedule* schedule);
     void saveStack(char* top);
 
     int id() const

@@ -23,12 +23,12 @@ Coroutine::~Coroutine()
     assert(state_ == kDead);
 }
 
-void Coroutine::start()
+void Coroutine::start(Schedule* schedule)
 {
     if (func_)
     {
         setState(kRunning);
-        func_();
+        func_(schedule);
     }
 }
 
