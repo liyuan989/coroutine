@@ -3,20 +3,13 @@
 #ifndef __COROUTINE_NONCOPYABLE_H__
 #define __COROUTINE_NONCOPYABLE_H__
 
-namespace coroutine
-{
+namespace coroutine {
 
 // Empty base class emphasis the objects of derived class are non-copyable.
-class Noncopyable
-{
+class Noncopyable {
 protected:
-    Noncopyable()
-    {
-    }
-
-    ~Noncopyable()
-    {
-    }
+    Noncopyable() { }
+    ~Noncopyable() { }
 
 private:
     Noncopyable(const Noncopyable&);
@@ -26,3 +19,4 @@ private:
 }  // namespace coroutine
 
 #endif
+

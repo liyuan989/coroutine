@@ -1,4 +1,4 @@
-#include "Schedule.h"
+#include "schedule.h"
 
 #include <sys/time.h>
 
@@ -7,13 +7,11 @@
 
 using namespace coroutine;
 
-void func(Schedule* schedule)
-{
+void func(Schedule* schedule) {
     schedule->suspendCurrentCoroutine();
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
     Schedule schedule;
     int coroutine1 = schedule.createCoroutine(func);
     int coroutine2 = schedule.createCoroutine(func);
@@ -21,8 +19,7 @@ int main(int argc, char* argv[])
     struct timeval tv_start;
     gettimeofday(&tv_start, NULL);
     int64_t start = static_cast<int64_t>(tv_start.tv_sec) * kMicrosecondsPerSecond + tv_start.tv_usec;
-    for (int i = 0; i < 2000 * 10000; ++i)
-    {
+    for (int i = 0; i < 2000 * 10000; ++i) {
         schedule.runCoroutineById(coroutine1);
         schedule.runCoroutineById(coroutine2);
     }
@@ -33,3 +30,4 @@ int main(int argc, char* argv[])
            static_cast<double>(end - start) / kMicrosecondsPerSecond);
     return 0;
 }
+

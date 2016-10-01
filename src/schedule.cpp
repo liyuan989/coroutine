@@ -1,19 +1,16 @@
-#include "Schedule.h"
+#include "schedule.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-namespace coroutine
-{
+namespace coroutine {
 
-void coroutineFunc(uint32_t low32, uint32_t high32)
-{
+void coroutineFunc(uint32_t low32, uint32_t high32) {
     uintptr_t ptr = static_cast<uintptr_t>(low32) | (static_cast<uintptr_t>(high32) << 32);
     Schedule* schedule = reinterpret_cast<Schedule*>(ptr);
     int id = schedule->getRunningCoroutineId();
     const CoroutinePtr& coroutine = schedule->getCoroutineById(id);
-    if (coroutine)
-    {
+    if (coroutine) {
         coroutine->start(schedule);
     }
     coroutine->setState(Coroutine::kDead);
@@ -26,24 +23,18 @@ const int Schedule::kStackSize;
 Schedule::Schedule(int size)
     : kCapacity_(size),
       running_id_(-1),
-      flags_(size, 0)
-{
+      flags_(size, 0) {
 }
 
-Schedule::~Schedule()
-{
+Schedule::~Schedule() {
     assert(running_id_ == -1);
 }
 
-int Schedule::createCoroutine(const CoroutineFunc& func)
-{
-    if (coroutines_.size() < static_cast<size_t>(kCapacity_))
-    {
-        for (int i = 0; i < kCapacity_; ++i)
-        {
+int Schedule::createCoroutine(const CoroutineFunc& func) {
+    if (coroutines_.size() < static_cast<size_t>(kCapacity_)) {
+        for (int i = 0; i < kCapacity_; ++i) {
             int id = (static_cast<int>(coroutines_.size()) + i) % kCapacity_;
-            if (flags_[id] == 0)
-            {
+            if (flags_[id] == 0) {
                 CoroutinePtr new_coroutine(new Coroutine(func, id));
                 flags_[id] = 1;
                 coroutines_[id] = new_coroutine;
@@ -52,27 +43,21 @@ int Schedule::createCoroutine(const CoroutineFunc& func)
         }
         assert(0);
         return -1;
-    }
-    else
-    {
+    } else {
         return -1;
     }
 }
 
-void Schedule::runCoroutineById(int id)
-{
+void Schedule::runCoroutineById(int id) {
     assert(running_id_ == -1);
     assert(0 <= id && id < kCapacity_);
     CoroutineMap::const_iterator it = coroutines_.find(id);
-    if (it != coroutines_.end())
-    {
+    if (it != coroutines_.end()) {
         const CoroutinePtr& coroutine = it->second;
-        if (coroutine)
-        {
+        if (coroutine) {
             assert(id == coroutine->id());
             Coroutine::State state = coroutine->state();
-            if (state == Coroutine::kReady)
-            {
+            if (state == Coroutine::kReady) {
                 getcontext(coroutine->getContextMutable());
                 coroutine->getContextMutable()->uc_stack.ss_sp = stack_;
                 coroutine->getContextMutable()->uc_stack.ss_size = kStackSize;
@@ -86,35 +71,26 @@ void Schedule::runCoroutineById(int id)
                             static_cast<uint32_t>(ptr),
                             static_cast<uint32_t>(ptr >> 32));
                 swapcontext(&main_context_, coroutine->getContextMutable());
-            }
-            else if (state == Coroutine::kSuspend)
-            {
+            } else if (state == Coroutine::kSuspend) {
                 memcpy(stack_ + kStackSize - coroutine->size(), coroutine->stack(), coroutine->size());
                 running_id_ = id;
                 coroutine->setState(Coroutine::kRunning);
                 swapcontext(&main_context_, coroutine->getContextMutable());
-            }
-            else
-            {
+            } else {
                 assert(0);
             }
-        }
-        else
-        {
+        } else {
             assert(0);
         }
     }
 }
 
-void Schedule::suspendCurrentCoroutine()
-{
+void Schedule::suspendCurrentCoroutine() {
     assert(0 <= running_id_ && running_id_ < kCapacity_);
     CoroutineMap::const_iterator it = coroutines_.find(running_id_);
-    if (it != coroutines_.end())
-    {
+    if (it != coroutines_.end()) {
         const CoroutinePtr& coroutine = it->second;
-        if (coroutine)
-        {
+        if (coroutine) {
             assert(running_id_ == coroutine->id());
             Coroutine* p = coroutine.get();
             assert(reinterpret_cast<char*>(&p) > stack_);
@@ -123,61 +99,45 @@ void Schedule::suspendCurrentCoroutine()
             coroutine->setState(Coroutine::kSuspend);
             running_id_ = -1;
             swapcontext(coroutine->getContextMutable(), &main_context_);
-        }
-        else
-        {
+        } else {
             assert(0);
         }
-    }
-    else
-    {
+    } else {
         assert(0);
     }
 }
 
-Coroutine::State Schedule::getCoroutineStateById(int id) const
-{
+Coroutine::State Schedule::getCoroutineStateById(int id) const {
     CoroutineMap::const_iterator it = coroutines_.find(id);
-    if (it != coroutines_.end())
-    {
+    if (it != coroutines_.end()) {
         const CoroutinePtr& coroutine = it->second;
-        if (coroutine)
-        {
+        if (coroutine) {
             assert(id == coroutine->id());
             return coroutine->state();
-        }
-        else
-        {
+        } else {
             return Coroutine::kInvalid;
         }
-    }
-    else
-    {
+    } else {
         return Coroutine::kInvalid;
     }
 }
 
-CoroutinePtr Schedule::getCoroutineById(int id) const
-{
+CoroutinePtr Schedule::getCoroutineById(int id) const {
     CoroutineMap::const_iterator it = coroutines_.find(id);
-    if (it != coroutines_.end())
-    {
+    if (it != coroutines_.end()) {
         return it->second;
-    }
-    else
-    {
+    } else {
         return CoroutinePtr();
     }
 }
 
-void Schedule::deleteCoroutineById(int id)
-{
+void Schedule::deleteCoroutineById(int id) {
     CoroutineMap::iterator it = coroutines_.find(id);
-    if (it != coroutines_.end())
-    {
+    if (it != coroutines_.end()) {
         coroutines_.erase(it);
         flags_[id] = 0;
     }
 }
 
 }  // namespace coroutine
+

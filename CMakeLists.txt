@@ -17,7 +17,8 @@ set(CMAKE_CXX_FLAGS
 -Wreorder
 -march=native
 -D_FILE_OFFSET_BITS=64
--rdynamic
+#-rdynamic
+-std=c++1y
 )
 
 if(CMAKE_BUILD_BITS EQUAL 32)
@@ -32,12 +33,6 @@ elseif(${CMAKE_BUILD_TYPE} STREQUAL "release")
     set(LIBRARY_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/lib/release)
 else()
     message(FATAL_ERROR "Wrong build option! usage: -DCMAKE_BUILD_TYPE=Debug/Release")
-endif()
-
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-    message(STATUS "found Boost")
-    include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
 include_directories(src)
